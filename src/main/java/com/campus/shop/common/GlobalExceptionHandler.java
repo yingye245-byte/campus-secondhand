@@ -4,11 +4,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -52,6 +55,14 @@ public class GlobalExceptionHandler {
             mv.addObject("code", 404);
             mv.addObject("message", "页面或资源不存在：" + request.getRequestURI());
             return mv;
+        }
+        if (e instanceof MissingServletRequestParameterException
+                || e instanceof MethodArgumentTypeMismatchException
+                || e instanceof HttpRequestMethodNotSupportedException
+                || e instanceof org.springframework.web.HttpSessionRequiredException) {
+            // 表单参数缺失/类型不匹配属于客户端输入问题，只记 WARN，不打 500 堆栈
+            log.warn("[请求参数异常] {} {}", request.getRequestURI(), e.getMessage());
+            return build(400, "请求参数有误，请返回上一页重新提交", request, handler);
         }
         log.error("[系统异常] {}", request.getRequestURI(), e);
         String msg = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();

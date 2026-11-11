@@ -22,7 +22,8 @@
 
 ```bash
 # 1. 初始化数据库（创建库、账号、表与演示数据）
-mysql -uroot -p < sql/campus_secondhand.sql
+mysql -uroot -p < sql/db_init_user.sql      # 创建应用专用账号 campus/campus123
+mysql -ucampus -pcampus123 < sql/campus_secondhand.sql   # 建库建表 + 演示数据
 
 # 2. 确保 Redis 已启动
 redis-cli ping        # 期望 PONG
@@ -82,13 +83,27 @@ src/main/resources
 └── application*.yml  dev / test / prod 多环境配置
 ```
 
+## 验证与答辩演示
+
+```powershell
+# 1. 启动自检：应用启动后日志会打印数据库 / Redis 状态
+#    ================ 启动自检开始（profile = dev）================
+#    [自检-数据库] 连接正常，表数量 = 9，用户 8 人，在售商品 38 件，订单 25 笔
+#    [自检-Redis] 读写正常
+
+# 2. 超时取消端到端验证（自动下单 -> 模拟超时 -> 触发扫描 -> 校验订单与商品状态）
+powershell -ExecutionPolicy Bypass -File docs\verify_timeout.ps1
+```
+
+答辩演示顺序建议：admin 看板（定时任务一键演示）→ 卖家发布 → admin 审核 → 买家下单支付 → 卖家确认 → 买家收货 → 看板数据变化。
+
 ## 交付文档
 
 | 文档 | 说明 |
 | --- | --- |
 | `校园二手闲置交易平台_开发文档.docx` | 需求、设计、数据库、技术实现、页面、测试、分工、评分对照 |
 | `校园二手闲置交易平台_部署文档.docx` | Windows 开发环境与 Linux + Nginx 生产部署、常见问题排错 |
-| `校园二手闲置交易平台_源码核心代码说明.docx` | 64 个 Java 类全文与关键 SQL |
+| `校园二手闲置交易平台_源码核心代码说明.docx` | 65 个 Java 类全文与关键 SQL |
 | `校园二手闲置交易平台_答辩PPT.pptx` | 12 页答辩演示稿 |
 | `校园二手闲置交易平台_数据库设计.xlsx` | 9 张表结构设计与索引说明 |
 

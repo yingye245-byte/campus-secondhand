@@ -75,6 +75,7 @@ public class ExtraServiceImpl implements ExtraService {
     public Long addComment(Long itemId, Long fromUserId, String content) {
         Item item = itemMapper.selectById(itemId);
         if (item == null) throw new BizException("商品不存在");
+        if (item.getUserId().equals(fromUserId)) throw new BizException("不能给自己的商品留言");
         if (content == null || content.isBlank()) throw new BizException("留言内容不能为空");
         if (content.length() > 500) throw new BizException("留言最多 500 字");
 
