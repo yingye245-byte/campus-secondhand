@@ -131,31 +131,31 @@ public class AdminController {
     /* ---------- 图表数据接口（ECharts 异步加载） ---------- */
 
     @ResponseBody
-    @GetMapping("/chart/category")
+    @GetMapping(value = "/chart/category", produces = "application/json;charset=UTF-8")
     public List<Map<String, Object>> chartCategory() {
         return extraService.categoryDistribution();
     }
 
     @ResponseBody
-    @GetMapping("/chart/deal")
+    @GetMapping(value = "/chart/deal", produces = "application/json;charset=UTF-8")
     public List<Map<String, Object>> chartDeal(@RequestParam(defaultValue = "7") int days) {
         return extraService.dealTrend(days);
     }
 
     @ResponseBody
-    @GetMapping("/chart/status")
+    @GetMapping(value = "/chart/status", produces = "application/json;charset=UTF-8")
     public List<Map<String, Object>> chartStatus() {
         return extraService.orderStatusDistribution();
     }
 
     @ResponseBody
-    @GetMapping("/chart/seller")
+    @GetMapping(value = "/chart/seller", produces = "application/json;charset=UTF-8")
     public List<Map<String, Object>> chartSeller() {
         return extraService.sellerRank(5);
     }
 
     @ResponseBody
-    @GetMapping("/chart/role")
+    @GetMapping(value = "/chart/role", produces = "application/json;charset=UTF-8")
     public List<Map<String, Object>> chartRole() {
         return userService.countByRole();
     }

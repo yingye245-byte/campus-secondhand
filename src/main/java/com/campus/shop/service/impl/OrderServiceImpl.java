@@ -164,7 +164,13 @@ public class OrderServiceImpl implements OrderService {
         boolean isBuyer = order.getBuyerId().equals(userId);
         boolean isSeller = order.getSellerId().equals(userId);
         if (!isBuyer && !isSeller) throw new BizException(403, "无权操作该订单");
-        orderStateService.cancelOrder(orderId, isBuyer ? "买家主动取消" : "卖家取消订单");
+        if (!Integer.valueOf(Order.STATUS_UNPAID).equals(order.getStatus())) {
+            throw new BizException("订单当前状态（" + order.getStatusName() + "）无法取消，如需取消请联系管理员");
+        }
+        boolean done = orderStateService.cancelOrder(orderId, isBuyer ? "买家主动取消" : "卖家取消订单");
+        if (!done) {
+            throw new BizException("订单取消失败，可能已被其他操作处理，请刷新后重试");
+        }
     }
 
     @Override

@@ -112,7 +112,23 @@ public class OrderController {
     public String cancel(@PathVariable Long id,
                          @AuthenticationPrincipal LoginUser loginUser,
                          RedirectAttributes ra) {
-        return doAction(ra, () -> orderService.cancel(id, loginUser.getId()), "已取消订单", "/order/detail/" + id);
+        String error = doCancel(id, loginUser.getId());
+        if (error == null) {
+            ra.addFlashAttribute("success", "已取消订单，商品已恢复在售");
+        } else {
+            ra.addFlashAttribute("error", error);
+        }
+        return "redirect:/order/detail/" + id;
+    }
+
+    /** 取消订单：成功返回 null，失败返回失败原因 */
+    private String doCancel(Long id, Long userId) {
+        try {
+            orderService.cancel(id, userId);
+            return null;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     @FunctionalInterface
