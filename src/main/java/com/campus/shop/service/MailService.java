@@ -22,6 +22,16 @@ public class MailService {
     @Value("${spring.mail.username:}")
     private String from;
 
+    /** SMTP 授权码。占位符表示还没填，此时直接跳过发送，避免 MQ 消费线程反复重试拧巴日志 */
+    @Value("${spring.mail.password:}")
+    private String authCode;
+
+    /** 是否已配置可用的邮箱（发件账号 + 授权码都不为空且不是占位符） */
+    public boolean isConfigured() {
+        return from != null && !from.isBlank() && !from.contains("placeholder")
+                && authCode != null && !authCode.isBlank() && !authCode.contains("placeholder");
+    }
+
     public boolean send(String to, String subject, String content) {
         if (to == null || to.isBlank()) {
             log.warn("[邮件] 收件人为空，跳过发送 subject={}", subject);
@@ -29,6 +39,11 @@ public class MailService {
         }
         if (from == null || from.isBlank() || from.contains("placeholder")) {
             log.warn("[邮件] 发件邮箱未配置（配置里是占位符），跳过发送 to={} subject={}", to, subject);
+            return false;
+        }
+        if (authCode == null || authCode.isBlank() || authCode.contains("placeholder")) {
+            log.warn("[邮件] 发件邮箱 {} 已配置，但 SMTP 授权码未填写，跳过发送 to={} subject={}",
+                    from, to, subject);
             return false;
         }
         try {

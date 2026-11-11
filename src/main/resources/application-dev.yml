@@ -27,8 +27,8 @@ spring:
   mail:
     host: smtp.qq.com
     port: 587
-    username: placeholder@qq.com
-    password: placeholder-auth-code
+    username: 2827468758@qq.com
+    password: qumnnwrikedrdhce
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
