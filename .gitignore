@@ -20,7 +20,7 @@ target/
 /upload/
 /uploadfiles/
 
-# ---- 数据库/配置敏感 ----
+# ---- 数据库/配置敏感信息 ----
 *.local.yml
 application-local.yml
 .env
