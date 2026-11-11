@@ -64,6 +64,13 @@ public class GlobalExceptionHandler {
             log.warn("[请求参数异常] {} {}", request.getRequestURI(), e.getMessage());
             return build(400, "请求参数有误，请返回上一页重新提交", request, handler);
         }
+        if (e instanceof org.springframework.web.servlet.resource.NoResourceFoundException
+                || e instanceof org.springframework.web.HttpRequestMethodNotSupportedException
+                || e instanceof org.springframework.web.servlet.NoHandlerFoundException) {
+            // 地址不存在 / 请求方法不匹配：属于客户端访问问题，只记 WARN 并返回 404
+            log.warn("[访问异常] {} {}", request.getRequestURI(), e.getClass().getSimpleName());
+            return build(404, "页面或接口不存在，请检查地址是否正确", request, handler);
+        }
         log.error("[系统异常] {}", request.getRequestURI(), e);
         String msg = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
         return build(500, "系统繁忙：" + msg, request, handler);
